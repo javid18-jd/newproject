@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#171324">
+<title>RJS Tailoring | Multi-Item Order & UPI Pay</title>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap');
+
+  :root {
+    --bg: #171324;
+    --panel: #231e34;
+    --panel-2: #2a2440;
+    --text: #fcf6ef;
+    --muted: #c0b5cd;
+    --gold: #edc68e;
+    --pink: #efafd0;
+    --green: #8fe3c2;
+    --border: rgba(255,255,255,.12);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "DM Sans", sans-serif;
+    line-height: 1.6;
+  }
+
+  button, input, select { font: inherit; }
+  a { color: inherit; text-decoration: none; }
+
+  :focus-visible {
+    outline: 3px solid var(--gold);
+    outline-offset: 4px;
+  }
+
+  .container { width: min(1140px, 92%); margin: auto; }
+
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    border-bottom: 1px solid var(--border);
+    background: rgba(23,19,36,.94);
+    backdrop-filter: blur(10px);
+  }
+
+  nav {
+    min-height: 82px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .logo { display: flex; align-items: center; gap: 12px; font-size: 18px; font-weight: 700; }
+  .logo-mark {
+    display: grid; place-items: center;
+    width: 42px; height: 42px;
+    border: 1px solid var(--gold); border-radius: 50%;
+    color: var(--gold); font-size: 22px;
+  }
+
+  .nav-links { display: flex; gap: 24px; }
+  .nav-links a { color: var(--muted); font-size: 14px; }
+  .nav-links a:hover { color: var(--gold); }
+
+  .button {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 13px 20px; border: 0; border-radius: 10px;
+    background: var(--gold); color: #251d21; font-weight: 700;
+    cursor: pointer; transition: transform .2s, box-shadow .2s;
+  }
+  .button:hover { transform: translateY(-3px); box-shadow: 0 10px 30px #edc68e22; }
+  .button.secondary { background: transparent; border: 1px solid var(--border); color: var(--text); }
+
+  .hero {
+    display: grid;
+    grid-template-columns: 1.05fr .9fr;
+    align-items: center;
+    gap: 55px;
+    padding: 70px 0;
+  }
+
+  .eyebrow {
+    color: var(--gold); text-transform: uppercase;
+    letter-spacing: 3px; font-size: 11px; font-weight: 700;
+    margin-bottom: 18px;
+  }
+
+  h1, h2, h3 { font-family: "Playfair Display", Georgia, serif; line-height: 1.15; }
+  h1 { font-size: clamp(38px, 5vw, 62px); font-weight: 500; margin: 0 0 20px; }
+  h1 em { color: var(--pink); font-weight: 500; font-style: normal; }
+  .hero p { color: var(--muted); max-width: 430px; }
+  .hero-actions { display: flex; flex-wrap: wrap; gap: 14px; margin: 26px 0; }
+
+  .showcase { perspective: 1000px; position: relative; padding: 20px; }
+  .showcase::before {
+    content: ""; position: absolute; inset: 15%;
+    background: #a161ca; filter: blur(100px); opacity: .25; pointer-events: none;
+  }
+
+  .display {
+    height: 400px; position: relative;
+    display: grid; place-items: center;
+    border: 1px solid #ffffff26;
+    border-radius: 160px 160px 26px 26px;
+    background: radial-gradient(ellipse at 50% 25%, #6d456f, transparent 70%),
+                linear-gradient(145deg, #42304d, #221c32);
+    box-shadow: 20px 30px 60px #0005, inset 0 0 70px #ffffff06;
+    transform-style: preserve-3d;
+    animation: float 7s ease-in-out infinite;
+  }
+
+  .hero-garment {
+    width: 235px; height: 300px; color: var(--pink);
+    filter: drop-shadow(15px 20px 8px #0004);
+    transform: translateZ(60px) rotate(-6deg);
+  }
+
+  .floating-label {
+    position: absolute; padding: 11px 15px;
+    background: #f8efe6; color: #33243c; border-radius: 12px;
+    box-shadow: 0 15px 35px #0003; transform: translateZ(90px);
+    font-size: 12px; z-index: 2;
+  }
+  .floating-label strong { display: block; font-size: 14px; }
+  .label-top { top: 45px; right: -20px; }
+  .label-bottom { bottom: 45px; left: -25px; }
+
+  @keyframes float {
+    0%, 100% { transform: rotateY(-10deg) rotateX(4deg) translateY(0); }
+    50% { transform: rotateY(4deg) rotateX(-2deg) translateY(-14px); }
+  }
+
+  section { padding: 70px 0; scroll-margin-top: 90px; }
+
+  .section-heading { margin-bottom: 30px; }
+  h2 { font-size: clamp(30px, 4vw, 42px); margin: 0 0 10px; font-weight: 500; }
+  .section-heading p { color: var(--muted); margin: 0; max-width: 500px; }
+
+  .categories {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+    perspective: 1200px;
+  }
+
+  .cat-card {
+    --rx: 0deg; --ry: 0deg;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+    transform: rotateX(var(--rx)) rotateY(var(--ry));
+    transition: transform .18s ease, box-shadow .25s;
+    box-shadow: 0 14px 35px #0002;
+  }
+  .cat-card:hover { box-shadow: 0 25px 50px #0005; }
+  .cat-art {
+    height: 190px; position: relative;
+    display: grid; place-items: center;
+    background: radial-gradient(circle at 50% 35%, var(--glow), transparent 75%);
+  }
+  .cat-art svg {
+    width: 120px; height: 145px; color: var(--color);
+    filter: drop-shadow(10px 10px 4px #0003);
+    transform: rotate(-5deg);
+    transition: transform .4s;
+  }
+  .cat-card:hover svg { transform: translateY(-6px) rotate(3deg) scale(1.05); }
+  .cat-body { padding: 22px; border-top: 1px solid var(--border); }
+  .cat-body h3 { font-size: 22px; margin: 0 0 8px; }
+  .cat-body p { color: var(--muted); font-size: 13px; margin: 0 0 16px; }
+  .cat-from { color: var(--gold); font-weight: 700; font-size: 14px; }
+  .cat-from small { display: block; color: var(--muted); font-weight: 400; font-size: 11px; }
+
+  .price-panel {
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+    background: var(--panel);
+    margin-bottom: 36px;
+  }
+  .price-panel-head {
+    display: flex; align-items: center; gap: 14px;
+    padding: 20px 24px;
+    background: var(--panel-2);
+    border-bottom: 1px solid var(--border);
+  }
+  .price-panel-head .icon {
+    width: 42px; height: 42px; display: grid; place-items: center;
+    border-radius: 12px; font-size: 20px; color: var(--color);
+    background: color-mix(in srgb, var(--color) 18%, transparent);
+  }
+  .price-panel-head h3 { margin: 0; font-size: 20px; }
+  .price-panel-head span { color: var(--muted); font-size: 12px; }
+
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    text-align: left; font-size: 11px; text-transform: uppercase;
+    letter-spacing: 1px; color: var(--muted); font-weight: 600;
+    padding: 14px 24px; border-bottom: 1px solid var(--border);
+  }
+  tbody td {
+    padding: 16px 24px; border-bottom: 1px solid var(--border);
+    font-size: 14px; vertical-align: middle;
+  }
+  tbody tr:last-child td { border-bottom: 0; }
+  tbody tr:hover { background: #ffffff05; }
+  .item-name { font-weight: 600; }
+  .item-price { color: var(--gold); font-weight: 700; font-size: 16px; white-space: nowrap; }
+
+  .qr-cell { display: flex; align-items: center; gap: 12px; }
+  .qr-cell img {
+    width: 58px; height: 58px; border-radius: 8px;
+    background: #fff; padding: 4px; flex-shrink: 0;
+    border: 1px solid #ddd;
+  }
+  .qr-cell .qr-text { font-size: 11px; color: var(--muted); }
+  .qr-cell .qr-text strong { display: block; color: var(--text); font-size: 12px; }
+  .th-qr { text-align: center !important; }
+
+  .pricing-note {
+    color: var(--muted); font-size: 12px; margin-top: 10px;
+  }
+
+  /* Multi-item order rows */
+  .order-row {
+    display: grid;
+    grid-template-columns: 2fr 100px 70px 60px 80px;
+    gap: 12px;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .order-row:first-of-type { padding-top: 0; }
+  .order-row:last-of-type { border-bottom: 0; }
+  .order-row input[type="number"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ffffff20;
+    border-radius: 8px;
+    background: #171324;
+    color: var(--text);
+  }
+  .line-total {
+    text-align: right;
+    font-weight: 600;
+    color: var(--gold);
+  }
+
+  .booking {
+    display: grid;
+    grid-template-columns: .85fr 1.15fr;
+    gap: 55px;
+    padding: 40px;
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    background: linear-gradient(135deg, #30243d, #211c30);
+  }
+
+  .booking-copy p { color: var(--muted); }
+  .steps { list-style: none; padding: 0; margin-top: 26px; }
+  .steps li { display: flex; gap: 12px; margin-bottom: 16px; align-items: center; font-size: 14px; }
+  .steps span {
+    display: grid; place-items: center; width: 30px; height: 30px;
+    flex-shrink: 0; border: 1px solid #edc68e44; border-radius: 50%; color: var(--gold);
+  }
+
+  .bill-preview {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 16px;
+  }
+  .bill-preview h4 {
+    margin: 0 0 14px;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--gold);
+  }
+  .bill-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 6px 0;
+    border-bottom: 1px dashed #ffffff10;
+    font-size: 13px;
+  }
+  .bill-row:last-child { border-bottom: 0; }
+  .bill-row span { color: var(--muted); }
+  .bill-row strong { font-weight: 600; color: var(--text); }
+
+  .estimate { display: flex; align-items: center; justify-content: space-between; gap: 15px; margin-top: 4px; }
+  .estimate span { color: var(--muted); font-size: 14px; }
+  .estimate output { color: var(--gold); font-size: 30px; font-weight: 700; }
+
+  .form-note { color: var(--muted); font-size: 11px; margin: 0; }
+
+  footer { border-top: 1px solid var(--border); padding: 28px 0; color: var(--muted); font-size: 12px; }
+  .footer-inner { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+  footer strong { color: var(--gold); }
+
+  dialog {
+    width: min(520px, 92%); border: 1px solid var(--border);
+    background: var(--panel); color: var(--text);
+    border-radius: 20px; padding: 26px;
+  }
+  dialog::backdrop { background: #000a; backdrop-filter: blur(6px); }
+  dialog h2 { font-size: 26px; margin: 0 0 4px; }
+  dialog .dialog-sub { color: var(--muted); font-size: 12px; margin-bottom: 18px; }
+
+  dialog pre {
+    font: inherit; font-size: 13px; white-space: pre-wrap; overflow-wrap: anywhere;
+    background: var(--bg); padding: 16px; border-radius: 12px;
+    line-height: 1.5;
+  }
+
+  .dialog-qr { display: flex; align-items: center; gap: 16px; margin: 18px 0; }
+  .dialog-qr img { width: 120px; height: 120px; background: #fff; padding: 6px; border-radius: 10px; border: 1px solid #ddd; flex-shrink: 0; }
+  .dialog-qr div { font-size: 12px; color: var(--muted); }
+  .dialog-qr strong { display: block; color: var(--gold); font-size: 22px; margin-bottom: 6px; }
+
+  .dialog-link {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 10px 16px;
+    border-radius: 10px;
+    background: var(--gold);
+    color: #251d21;
+    font-weight: 700;
+    text-decoration: none;
+    font-size: 14px;
+  }
+  .dialog-link:hover { filter: brightness(1.08); }
+
+  .dialog-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+  #copy-status { min-height: 22px; font-size: 12px; color: var(--gold); }
+
+  @media (max-width: 900px) {
+    .categories { grid-template-columns: 1fr 1fr; }
+    .booking { grid-template-columns: 1fr; gap: 30px; padding: 28px; }
+    .order-row { grid-template-columns: 2fr 80px 60px 50px; gap: 8px; }
+  }
+
+  @media (max-width: 650px) {
+    .nav-links a:not(:last-child) { display: none; }
+    .hero { grid-template-columns: 1fr; padding: 45px 0; gap: 25px; }
+    .showcase { width: min(340px, 100%); margin: auto; }
+    .categories { grid-template-columns: 1fr; }
+    section { padding: 50px 0; }
+    thead { display: none; }
+    tbody td { display: block; padding: 8px 18px; border-bottom: 0; }
+    tbody tr { display: block; padding: 14px 0; border-bottom: 1px solid var(--border); }
+    .qr-cell { justify-content: flex-start; margin-top: 6px; }
+    .field-row { grid-template-columns: 1fr; }
+    .order-row { grid-template-columns: 1fr 1fr; gap: 6px; }
+    .line-total { text-align: left; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+    .cat-card { transform: none; }
+  }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="jacket-art" viewBox="0 0 220 260">
+      <path d="M70 45 35 58 12 118 49 135 65 102 59 208 Q110 230 161 208L155 102 171 135 208 118 185 58 150 45 Q110 76 70 45Z" fill="currentColor" stroke="#ffffff55" stroke-width="2"/>
+      <path d="M70 45Q110 130 150 45" fill="#211b30"/>
+      <path d="M110 84V219M63 188Q110 205 158 188" fill="none" stroke="#edc68e" stroke-width="4"/>
+      <path d="M36 65 22 108M183 65 198 108" stroke="#edc68e" stroke-width="5"/>
+      <g fill="#edc68e"><circle cx="119" cy="118" r="3"/><circle cx="119" cy="139" r="3"/><circle cx="119" cy="160" r="3"/><circle cx="119" cy="181" r="3"/></g>
+    </symbol>
+    <symbol id="churidar-art" viewBox="0 0 220 300">
+      <path d="M81 189 77 285 100 285 112 211 120 285 143 285 140 189" fill="#dfb97c"/>
+      <path d="M76 28 47 43 23 133 48 141 72 79 58 233 Q110 248 162 233L148 79 172 141 197 133 173 43 144 28 Q110 46 76 28Z" fill="currentColor" stroke="#ffffff55" stroke-width="2"/>
+      <path d="M91 32Q110 79 130 32M64 220Q110 232 156 220" fill="none" stroke="#edc68e" stroke-width="5"/>
+      <path d="M136 33Q166 109 138 209L159 223Q187 122 151 35" fill="#edc68e" opacity=".8"/>
+      <g fill="#edc68e" opacity=".8"><circle cx="88" cy="129" r="3"/><circle cx="123" cy="151" r="3"/><circle cx="83" cy="182" r="3"/><circle cx="116" cy="207" r="3"/></g>
+    </symbol>
+    <symbol id="nighty-art" viewBox="0 0 220 300">
+      <path d="M76 29 42 46 17 95 50 114 71 82 42 276 Q110 294 178 276L149 82 170 114 203 95 178 46 144 29 Q110 49 76 29Z" fill="currentColor" stroke="#ffffff66" stroke-width="2"/>
+      <path d="M77 30Q110 87 143 30" fill="#211b30"/>
+      <path d="M74 91Q110 109 146 91M48 263Q110 278 172 263" fill="none" stroke="#ffffff66" stroke-width="3"/>
+      <g fill="#f9debd">
+        <path d="m88 123 3 7 7 3-7 3-3 7-3-7-7-3 7-3Z"/>
+        <path d="m133 159 3 7 7 3-7 3-3 7-3-7-7-3 7-3Z"/>
+        <path d="m81 205 3 7 7 3-7 3-3 7-3-7-7-3 7-3Z"/>
+        <path d="m137 237 3 7 7 3-7 3-3 7-3-7-7-3 7-3Z"/>
+      </g>
+    </symbol>
+  </defs>
+</svg>
+
+<header>
+  <nav class="container">
+    <a href="#" class="logo"><span class="logo-mark">✂</span> RJS <span style="font-weight:400">Tailoring</span></a>
+    <div class="nav-links">
+      <a href="#jacket-pricing">Jacket</a>
+      <a href="#chudidhar-pricing">Chudidhar</a>
+      <a href="#nighty-pricing">Nighty</a>
+      <a href="#booking">Order & Pay</a>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <div class="container">
+
+    <section class="hero">
+      <div>
+        <div class="eyebrow">Stitching & Ready-to-wear</div>
+        <h1>Perfectly stitched.<br><em>Simply priced.</em></h1>
+        <p>
+          Add multiple items (e.g., lining jacket + sadha chudidhar), see your total bill instantly, and pay directly via UPI.
+        </p>
+        <div class="hero-actions">
+          <a href="#jacket-pricing" class="button">View price list ↗</a>
+          <a href="#booking" class="button secondary">Build order</a>
+        </div>
+      </div>
+
+      <div class="showcase" aria-label="Decorative display">
+        <div class="display">
+          <svg class="hero-garment" aria-hidden="true"><use href="#churidar-art"/></svg>
+          <div class="floating-label label-top"><strong>Made for you</strong>Custom stitching</div>
+          <div class="floating-label label-bottom"><strong>Multi-item bill</strong>Pay via UPI</div>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="cat-title">
+      <div class="section-heading">
+        <div class="eyebrow">Choose a category</div>
+        <h2 id="cat-title">What are we stitching today?</h2>
+        <p>Jump straight to a price list, or scroll down to see everything at once.</p>
+      </div>
+
+      <div class="categories">
+        <a class="cat-card" href="#jacket-pricing" style="text-decoration:none">
+          <div class="cat-art" style="--color:#ca8eb7; --glow:#84507566">
+            <svg aria-hidden="true"><use href="#jacket-art"/></svg>
+          </div>
+          <div class="cat-body">
+            <h3>Jacket Stitching</h3>
+            <p>Sadha & lining options for your saree jacket / blouse.</p>
+            <div class="cat-from">From ₹150 <small>Sadha jacket</small></div>
+          </div>
+        </a>
+
+        <a class="cat-card" href="#chudidhar-pricing" style="text-decoration:none">
+          <div class="cat-art" style="--color:#80afa2; --glow:#417d7066">
+            <svg aria-hidden="true"><use href="#churidar-art"/></svg>
+          </div>
+          <div class="cat-body">
+            <h3>Chudidhar Stitching</h3>
+            <p>Sadha & lining chudidhar sets, stitched to your fit.</p>
+            <div class="cat-from">From ₹350 <small>Sadha chudidhar</small></div>
+          </div>
+        </a>
+
+        <a class="cat-card" href="#nighty-pricing" style="text-decoration:none">
+          <div class="cat-art" style="--color:#aa9acb; --glow:#6f589d66">
+            <svg aria-hidden="true"><use href="#nighty-art"/></svg>
+          </div>
+          <div class="cat-body">
+            <h3>Nighty Selling</h3>
+            <p>Sada, zipped, embroidery & batik / 3XL nighties.</p>
+            <div class="cat-from">From ₹275 <small>Sada nighty</small></div>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <!-- JACKET PRICING -->
+    <section id="jacket-pricing" aria-labelledby="jacket-title">
+      <div class="price-panel">
+        <div class="price-panel-head">
+          <div class="icon" style="--color:#ca8eb7">✂</div>
+          <div>
+            <h3 id="jacket-title">Jacket Stitching</h3>
+            <span>Custom stitching cost per piece</span>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr><th>Type</th><th>Price</th><th class="th-qr">Scan & Pay</th></tr>
+          </thead>
+          <tbody id="jacket-table"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- CHUDIDHAR PRICING -->
+    <section id="chudidhar-pricing" aria-labelledby="chudidhar-title">
+      <div class="price-panel">
+        <div class="price-panel-head">
+          <div class="icon" style="--color:#80afa2">✂</div>
+          <div>
+            <h3 id="chudidhar-title">Chudidhar Stitching</h3>
+            <span>Custom stitching cost per set</span>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr><th>Type</th><th>Price</th><th class="th-qr">Scan & Pay</th></tr>
+          </thead>
+          <tbody id="chudidhar-table"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- NIGHTY PRICING -->
+    <section id="nighty-pricing" aria-labelledby="nighty-title">
+      <div class="price-panel">
+        <div class="price-panel-head">
+          <div class="icon" style="--color:#aa9acb">♡</div>
+          <div>
+            <h3 id="nighty-title">Nighty — Selling Price</h3>
+            <span>Ready-to-wear nighty cost per piece</span>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr><th>Type</th><th>Price</th><th class="th-qr">Scan & Pay</th></tr>
+          </thead>
+          <tbody id="nighty-table"></tbody>
+        </table>
+      </div>
+      <p class="pricing-note">
+        * Prices shown are as provided by RJS Tailoring. <br>
+        Scan any QR code to pay via UPI: <strong>9840720814@ptyes</strong>.
+      </p>
+    </section>
+
+    <!-- ORDER & PAY -->
+    <section id="booking" aria-labelledby="booking-title">
+      <div class="booking">
+        <div class="booking-copy">
+          <div class="eyebrow">Build your order</div>
+          <h2 id="booking-title">Multi-item order & bill</h2>
+          <p>Select items with quantities below. The bill updates instantly. After confirming, you get a direct UPI link to pay.</p>
+
+          <ol class="steps">
+            <li><span>1</span> Add items with quantities</li>
+            <li><span>2</span> Review total bill</li>
+            <li><span>3</span> Click the direct UPI link to pay instantly</li>
+          </ol>
+
+          <div class="bill-preview" id="bill-preview">
+            <h4>Bill Preview</h4>
+            <div id="bill-rows">
+              <div class="bill-row"><span>Select items to start</span> <strong>—</strong></div>
+            </div>
+            <div class="bill-row" style="margin-top:10px; border-top:1px solid var(--gold); padding-top:10px;">
+              <span>Total</span> <strong id="bill-total-display">₹0</strong>
+            </div>
+          </div>
+        </div>
+
+        <form id="order-form" onsubmit="event.preventDefault(); generateOrder();">
+          <div id="order-rows">
+            <!-- Dynamic rows added by JS -->
+          </div>
+
+          <button type="button" class="button" onclick="addOrderRow()" style="width:100%; justify-content:center;">
+            + Add another item
+          </button>
+
+          <div>
+            <label for="customer">Your name</label>
+            <input id="customer" name="customer" placeholder="Enter your name" maxlength="80" required>
+          </div>
+
+          <div>
+            <label for="phone">Phone (optional)</label>
+            <input id="phone" name="phone" type="tel" placeholder="For order confirmation">
+          </div>
+
+          <div class="estimate">
+            <span>Total to pay</span>
+            <output id="total-output">₹0</output>
+          </div>
+
+          <button type="submit" class="button">Generate bill & UPI link ↗</button>
+          <p class="form-note">
+            This creates an order summary with a direct UPI link that opens your payment app with the amount filled in.
+          </p>
+        </form>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<footer>
+  <div class="container footer-inner">
+    <div><strong>RJS Tailoring</strong> — Made to fit. Made for you.</div>
+    <div>UPI: 9840720814@ptyes | © <span id="year"></span> RJS Tailoring</div>
+  </div>
+</footer>
+
+<dialog id="order-dialog" aria-labelledby="dialog-title">
+  <h2 id="dialog-title">Your Bill — Pay via UPI</h2>
+  <p class="dialog-sub">UPI ID: 9840720814@ptyes | Scan or click the direct link below</p>
+
+  <div class="dialog-qr">
+    <a id="qr-link" href="#" target="_blank" aria-label="Open UPI payment">
+      <img id="dialog-qr-img" src="" alt="Scan this QR to pay via UPI">
+    </a>
+    <div>
+      <strong id="dialog-amount">₹0</strong>
+      <br>
+      <a id="upi-link" class="dialog-link" href="#">Pay with UPI App</a>
+      <div style="margin-top:6px; font-size:11px; color:var(--muted);">
+        Click "Pay with UPI App" to open your phone's payment app automatically.
+      </div>
+    </div>
+  </div>
+
+  <pre id="order-summary"></pre>
+
+  <div class="dialog-actions">
+    <button id="copy-order" class="button" type="button" onclick="copyOrderText()">Copy order & link</button>
+    <button id="close-dialog" class="button secondary" type="button" onclick="document.getElementById('order-dialog').close()">Close</button>
+  </div>
+  <div id="copy-status" role="status"></div>
+</dialog>
+
+<script>
+  const UPI_ID = "9840720814@ptyes";
+  const PAYEE_NAME = "RJS Tailoring";
+  const MY_QR_IMAGE = "rjs-qr.jpeg"; // Your uploaded QR file (must be in same folder on server)
+
+  const catalog = [
+    { key: "jacket-sadha",       category: "jacket",    name: "Sadha Jacket",                 price: 150 },
+    { key: "jacket-lining",      category: "jacket",    name: "Lining Jacket",                price: 300 },
+    { key: "chudidhar-sadha",    category: "chudidhar", name: "Sadha Chudidhar",              price: 350 },
+    { key: "chudidhar-lining",   category: "chudidhar", name: "Lining Chudidhar",             price: 450 },
+    { key: "nighty-sadha",       category: "nighty",    name: "Sada Nighty",                  price: 275 },
+    { key: "nighty-zip",         category: "nighty",    name: "Zipped Nighty",                price: 300 },
+    { key: "nighty-embroidery",  category: "nighty",    name: "Embroidery Nighty",            price: 350 },
+    { key: "nighty-batik-3xl",   category: "nighty",    name: "Single Batik Nighty / 3XL",    price: 390 }
+  ];
+
+  const currency = new Intl.NumberFormat("en-IN", {
+    style: "currency", currency: "INR", maximumFractionDigits: 0
+  });
+
+  function buildUpiLink(amount, note) {
+    const params = new URLSearchParams({
+      pa: UPI_ID, pn: PAYEE_NAME, am: String(amount), cu: "INR", tn: note
+    });
+    return `upi://pay?${params.toString()}`;
+  }
+
+  function qrImageUrl(amount, note) {
+    return MY_QR_IMAGE;
+  }
+
+  // Dynamic multi-item rows
+  let rowCount = 0;
+
+  function addOrderRow(preSelect = "", preQty = 1) {
+    rowCount++;
+    const container = document.getElementById("order-rows");
+    const row = document.createElement("div");
+    row.className = "order-row";
+    row.id = `row-${rowCount}`;
+    row.innerHTML = `
+      <select class="row-item" onchange="recalcBill()" aria-label="Select item">
+        <option value="">Select item...</option>
+        ${catalog.map(i => `<option value="${i.key}" ${i.key===preSelect?"selected":""}>${i.name} — ${currency.format(i.price)}</option>`).join("")}
+      </select>
+      <input type="number" class="row-qty" value="${preQty}" min="1" max="50" step="1" oninput="recalcBill()" aria-label="Quantity">
+      <span style="font-size:13px; color:var(--muted);">×</span>
+      <span class="line-price" style="font-weight:600; color:var(--gold);">—</span>
+      <span class="line-total">—</span>
+      <button type="button" onclick="removeRow('row-${rowCount}')" style="padding:6px 10px; font-size:12px; border-radius:8px; background:#ff4d4d; color:#fff; border:0; cursor:pointer;">Remove</button>
+    `;
+    container.appendChild(row);
+    recalcBill();
+  }
+
+  function removeRow(id) {
+    document.getElementById(id).remove();
+    recalcBill();
+  }
+
+  // Build tables
+  function renderTable(category, tbodyId) {
+    const tbody = document.getElementById(tbodyId);
+    const rows = catalog.filter(i => i.category === category);
+    tbody.innerHTML = rows.map(item => `
+      <tr>
+        <td class="item-name">${item.name}</td>
+        <td class="item-price">${currency.format(item.price)}</td>
+        <td>
+          <div class="qr-cell">
+            <img src="${qrImageUrl(item.price, item.name)}"
+                 alt="QR for ${item.name} — ${currency.format(item.price)}"
+                 width="58" height="58" loading="lazy">
+            <div class="qr-text"><strong>Scan to pay</strong>${currency.format(item.price)}</div>
+          </div>
+        </td>
+      </tr>
+    `).join("");
+  }
+
+  renderTable("jacket", "jacket-table");
+  renderTable("chudidhar", "chudidhar-table");
+  renderTable("nighty", "nighty-table");
+
+  // Recalculate total and preview
+  function recalcBill() {
+    let total = 0;
+    const rows = document.querySelectorAll(".order-row");
+    const billRows = document.getElementById("bill-rows");
+    billRows.innerHTML = "";
+
+    rows.forEach(row => {
+      const select = row.querySelector(".row-item");
+      const qtyInput = row.querySelector(".row-qty");
+      const linePrice = row.querySelector(".line-price");
+      const lineTotal = row.querySelector(".line-total");
+
+      const itemKey = select.value;
+      const qty = parseInt(qtyInput.value) || 0;
+      const item = catalog.find(i => i.key === itemKey);
+
+      if (item && qty > 0) {
+        const price = item.price;
+        const line = price * qty;
+        total += line;
+        linePrice.textContent = currency.format(price);
+        lineTotal.textContent = currency.format(line);
+
+        // Add to bill preview
+        const br = document.createElement("div");
+        br.className = "bill-row";
+        br.innerHTML = `<span>${qty} × ${item.name}</span> <strong>${currency.format(line)}</strong>`;
+        billRows.appendChild(br);
+      } else {
+        linePrice.textContent = "—";
+        lineTotal.textContent = "—";
+      }
+    });
+
+    if (total === 0) {
+      billRows.innerHTML = `<div class="bill-row"><span>Select items to start</span> <strong>—</strong></div>`;
+    }
+
+    document.getElementById("bill-total-display").textContent = currency.format(total);
+    document.getElementById("total-output").value = currency.format(total);
+  }
+
+  function generateOrder() {
+    const customer = document.getElementById("customer").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    if (!customer) { alert("Please enter your name"); document.getElementById("customer").focus(); return; }
+
+    // Gather selected items
+    const items = [];
+    document.querySelectorAll(".order-row").forEach(row => {
+      const select = row.querySelector(".row-item");
+      const qtyInput = row.querySelector(".row-qty");
+      const item = catalog.find(i => i.key === select.value);
+      const qty = parseInt(qtyInput.value) || 0;
+      if (item && qty > 0) {
+        items.push({ ...item, qty, line: item.price * qty });
+      }
+    });
+
+    if (items.length === 0) { alert("Please add at least one item"); return; }
+
+    const total = items.reduce((s, i) => s + i.line, 0);
+    const amountText = currency.format(total);
+
+    // Set dialog values
+    document.getElementById("dialog-amount").textContent = amountText;
+
+    const upiLink = buildUpiLink(total, `RJS Tailoring Order - ${customer}`);
+    document.getElementById("upi-link").href = upiLink;
+    document.getElementById("qr-link").href = upiLink;
+
+    // For QR display: if you want to show generated QR instead of static file, uncomment below:
+    // document.getElementById("dialog-qr-img").src = "https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=" + encodeURIComponent(upiLink);
+    // But we keep your uploaded image as default. To use generated dynamic QR with your UPI:
+    document.getElementById("dialog-qr-img").src = "https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=" + encodeURIComponent(upiLink);
+
+    // Copyable text (includes direct link)
+    const lines = [
+      "RJS TAILORING — ORDER BILL",
+      "",
+      `Name: ${customer}`,
+      phone ? `Phone: ${phone}` : "",
+      "---------------------------",
+      ...items.map(i => `${i.qty} × ${i.name}`),
+      `Unit prices: ${items.map(i => `${i.name} @ ${currency.format(i.price)}`).join(", ")}`,
+      `---------------------------`,
+      `Total: ${amountText}`,
+      ``,
+      `UPI ID: ${UPI_ID}`,
+      `Direct UPI Link: ${upiLink}`,
+      ``,
+      "Scan the QR or click the link in your message to open UPI app.",
+      "Confirm order with RJS Tailoring after payment."
+    ].filter(Boolean).join("\n");
+
+    document.getElementById("order-summary").textContent = lines;
+
+    // Update copy button to include the link in clipboard
+    document.getElementById("copy-order").onclick = () => {
+      const fullCopy = lines + "\n\nPay now: " + upiLink;
+      navigator.clipboard.writeText(fullCopy).then(() => {
+        document.getElementById("copy-status").textContent = "Copied with direct UPI link!";
+      }).catch(() => {
+        document.getElementById("copy-status").textContent = "Select all text to copy manually.";
+      });
+    };
+
+    document.getElementById("order-dialog").showModal();
+  }
+
+  function copyOrderText() {
+    const pre = document.getElementById("order-summary").textContent;
+    const upiLink = document.getElementById("upi-link").href;
+    const full = pre + "\n\nDirect Payment Link: " + upiLink;
+    navigator.clipboard.writeText(full).then(() => {
+      document.getElementById("copy-status").textContent = "Copied order + direct UPI link!";
+    }).catch(() => {
+      document.getElementById("copy-status").textContent = "Select text and copy manually.";
+    });
+  }
+
+  document.getElementById("close-dialog").onclick = () => {
+    document.getElementById("order-dialog").close();
+  };
+
+  document.getElementById("year").textContent = new Date().getFullYear();
+
+  // Initialize with one empty row
+  addOrderRow();
+</script>
+</body>
+</html>
+
+
